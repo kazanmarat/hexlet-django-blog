@@ -6,4 +6,5 @@ def index(request):
     })
 
 def about(request):
-    return render(request, 'about.html')
+    tags = [1, 2, 3]
+    return render(request, 'about.html', context={'tags': tags})
