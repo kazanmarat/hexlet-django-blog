@@ -1,5 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
+from django.contrib import messages
+from .forms import ArticleForm
 
 from hexlet_django_blog.article.models import Article
 
@@ -18,9 +20,20 @@ class ArticleView(View):
             'article': article,
         })
 
-# class ArticleCommentsView(View):
 
-#     def get(self, request, *args, **kwargs):
-#         comment = get_object_or_404(Comment, id=kwargs['id'], article__id=kwargs['article_id'])
+class ArticleFormCreateView(View):
 
-#         return render( ... )
+    def get(self, request, *args, **kwargs):
+        form = ArticleForm()
+        return render(request, 'articles/create.html',
+                      {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = ArticleForm(request.POST)
+        if form.is_valid(): # Если данные корректные, то сохраняем данные формы
+            form.save()
+            messages.success(request, 'FORM IS VALID')
+            return redirect('articles') # Редирект на указанный маршрут
+        # Если данные некорректные, то возвращаем человека обратно на страницу с заполненной формой
+        messages.success(request, 'FORM IS NOT VALID')
+        return render(request, 'articles/create.html', {'form': form})
